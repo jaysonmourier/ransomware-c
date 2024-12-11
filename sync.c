@@ -5,7 +5,7 @@
 HANDLE semaphore;
 HANDLE mutex;
 
-// sem
+// Semaphore
 int sync_create_semaphore() {
     if((semaphore = CreateSemaphore(
         NULL,
@@ -16,7 +16,6 @@ int sync_create_semaphore() {
         printf("(%s:%d) Error creating semaphore: %ld\n", __FILE__, __LINE__, GetLastError());
         return 1;
     }
-    printf("Semaphore créé avec succès : %p\n", semaphore);
     return 0;
 }
 
@@ -41,7 +40,7 @@ void sync_cleanup_semaphore() {
     }
 }
 
-// mutex
+// Mutex
 int sync_create_mutex() {
     if((mutex = CreateMutex(
         NULL,
@@ -51,7 +50,6 @@ int sync_create_mutex() {
         printf("(%s:%d) Error creating mutex: %ld\n", __FILE__, __LINE__, GetLastError());
         return 1;
     }
-    printf("Mutex créé avec succès : %p\n", mutex);
     return 0;
 }
 
