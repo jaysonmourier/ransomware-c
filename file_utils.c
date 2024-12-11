@@ -2,6 +2,7 @@
 #include <windows.h>
 #include "file_utils.h"
 #include "stack.h"
+#include "sync.h"
 
 #define UNICODE
 #define _UNICODE
@@ -45,6 +46,7 @@ void add_to_stack(WIN32_FIND_DATAW *file_data, wchar_t *path, struct Stack *fold
         stack_push(folders_stack, path);
     } else if (is_valid_file((wchar_t*)file_data->cFileName)) {
         stack_push(files_stack, path);
+        release_sem();
     }
 }
 
