@@ -25,6 +25,23 @@ static inline int fu_is_valid_file(const wchar_t *file) {
     return 0; 
 }
 
+static inline wchar_t *fu_add_extension(wchar_t *file_path) {
+    if(file_path == NULL) return NULL;
+    wchar_t *output;
+    wchar_t ext[] = EXT;
+    size_t file_len = wcslen(file_path);
+    size_t ext_len = wcslen(ext);
+
+    if(file_len + ext_len + 1 > 260) return NULL;
+
+    output = calloc(file_len + ext_len + 1, sizeof(wchar_t));
+    if(output == NULL) return NULL;
+
+    wcscpy(output, file_path);
+    wcscat(output, ext);
+    return output;
+}
+
 static inline bool fu_should_ignore(const WIN32_FIND_DATAW *find_file_data) {
     if((wcscmp((wchar_t*)find_file_data->cFileName, L".") == 0) || (wcscmp((wchar_t*)find_file_data->cFileName, L"..") == 0))
         return 1;
@@ -95,7 +112,7 @@ void fu_create_file_mappings(const wchar_t *file_path, DWORD *file_size, LPVOID 
 
     wchar_t *file_path_duplicated = wcsdup(file_path);
 
-    output_file = add_extension(file_path_duplicated);
+    output_file = fu_add_extension(file_path_duplicated);
     if (output_file == NULL) {
         return;
     }
@@ -167,4 +184,3 @@ void fu_create_file_mappings(const wchar_t *file_path, DWORD *file_size, LPVOID 
     CloseHandle(h_dest_map);
     CloseHandle(h_dest_file);
 }
-
