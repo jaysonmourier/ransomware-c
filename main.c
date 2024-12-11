@@ -52,7 +52,7 @@ int main(void) {
             folder_path = (wchar_t*)stack_pop(folders_stack);
         }
 
-        populate_stacks_from_directory(folder_path, folders_stack, files_stack);
+        fu_populate_stacks_from_directory(folder_path, folders_stack, files_stack);
         free(folder_path);
     } while(!stack_is_empty(folders_stack));
     end = time(NULL);

