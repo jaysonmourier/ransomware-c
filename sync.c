@@ -10,7 +10,7 @@ int sync_create_semaphore() {
     if((semaphore = CreateSemaphore(
         NULL,
         0,
-        1000000,
+        LONG_MAX,
         NULL
     )) == NULL) {
         printf("(%s:%d) Error creating semaphore: %ld\n", __FILE__, __LINE__, GetLastError());
