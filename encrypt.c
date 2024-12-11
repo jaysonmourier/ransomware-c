@@ -5,8 +5,6 @@
 #include "encrypt.h"
 #include "stack.h"
 
-#define EXT L".lock"
-
 static inline void lr13(uint64_t *data) {
     *data = (*data << 13) | (*data >> (64 - 13));
 }
