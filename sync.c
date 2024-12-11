@@ -6,7 +6,7 @@ HANDLE semaphore;
 HANDLE mutex;
 
 // sem
-int init_sem() {
+int sync_create_semaphore() {
     if((semaphore = CreateSemaphore(
         NULL,
         0,
@@ -20,13 +20,13 @@ int init_sem() {
     return 0;
 }
 
-void release_sem() {
+void sync_release_semaphore() {
     if(!ReleaseSemaphore(semaphore, 1, NULL)) {
         printf("(%s:%d) Error: unable to release semaphore (%ld)\n", __FILE__, __LINE__, GetLastError());
     }
 }
 
-void wait_sem() {
+void sync_wait_semaphore() {
     if(WaitForSingleObject(
         semaphore,
         INFINITE
@@ -35,14 +35,14 @@ void wait_sem() {
     }
 }
 
-void cleanup_sem() {
+void sync_cleanup_semaphore() {
     if(!CloseHandle(semaphore)) {
         printf("(%s:%d) Error clean up semaphore : %ld\n", __FILE__, __LINE__, GetLastError());
     }
 }
 
 // mutex
-int init_mutex() {
+int sync_create_mutex() {
     if((mutex = CreateMutex(
         NULL,
         FALSE,
@@ -55,14 +55,14 @@ int init_mutex() {
     return 0;
 }
 
-void lock_mutex() {
+void sync_lock_mutex() {
     WaitForSingleObject(mutex, INFINITE);
 }
 
-void unlock_mutex() {
+void sync_unlock_mutex() {
     ReleaseMutex(mutex);
 }
 
-void cleanup_mutex() {
+void sync_cleanup_mutex() {
     CloseHandle(mutex);
 }

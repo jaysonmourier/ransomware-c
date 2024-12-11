@@ -7,14 +7,14 @@ extern HANDLE semaphore;
 extern HANDLE mutex;
 
 // sem
-int init_sem();
-void release_sem();
-void wait_sem();
-void cleanup_sem();
+int sync_create_semaphore();
+void sync_release_semaphore();
+void sync_wait_semaphore();
+void sync_cleanup_semaphore();
 
 // mutex
-int init_mutex();
-void lock_mutex();
-void unlock_mutex();
-void cleanup_mutex();
+int sync_create_mutex();
+void sync_lock_mutex();
+void sync_unlock_mutex();
+void sync_cleanup_mutex();
 #endif

@@ -13,8 +13,8 @@ void free_str(void *element) {
 }
 
 int main(void) {
-    init_sem();
-    init_mutex();
+    sync_create_semaphore();
+    sync_create_mutex();
 
     struct Stack *files_stack = stack_init();
     struct Stack *folders_stack = stack_init();
@@ -71,7 +71,7 @@ int main(void) {
     assert(stack_is_empty(files_stack));
 
     stack_free(&files_stack, free_str);
-    cleanup_mutex();
-    cleanup_sem();
+    sync_cleanup_mutex();
+    sync_cleanup_semaphore();
     return 0;
 }
