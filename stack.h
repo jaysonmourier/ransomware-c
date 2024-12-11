@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#define INITIAL_STACK_CAPACITY 25
+#define INITIAL_STACK_CAPACITY 1000
 
 struct Stack {
     size_t capacity; 
