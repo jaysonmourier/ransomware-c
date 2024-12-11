@@ -3,7 +3,7 @@
 #include "file_utils.h"
 #include "stack.h"
 #include "sync.h"
-#include "encrypt.h"
+#include "crypto.h"
 
 #define UNICODE
 #define _UNICODE

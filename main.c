@@ -5,7 +5,6 @@
 #include "stack.h"
 #include "file_utils.h"
 #include "thread.h"
-#include "encrypt.h"
 #include "sync.h"
 
 #define ROOT_PATH L"C:\\Users\\mouri\\Documents\\projects\\ransomware\\test\\"

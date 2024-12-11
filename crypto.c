@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include "file_utils.h"
-#include "encrypt.h"
+#include "crypto.h"
 #include "stack.h"
 #include "sync.h"
 
