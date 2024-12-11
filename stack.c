@@ -98,26 +98,7 @@ void *stack_pop(struct Stack *stack) {
     return element;
 }
 
-void *stack_peek(struct Stack *stack) {
-    return ((stack != NULL) && !stack_is_empty(stack)) ? stack->data[stack->size - 1] : NULL;
-}
-
-size_t stack_size(struct Stack *stack) {
-    return (stack != NULL) ? stack->size : 0;
-}
-
 bool stack_is_empty(struct Stack *stack) {
     return (stack == NULL) || (stack->size == 0);
 }
 
-void stack_clear(struct Stack *stack, void (*fn)(void*)) {
-    if((stack != NULL) && !stack_is_empty(stack)) {
-        if(fn != NULL) {
-            for(size_t i = 0; i < stack->size; ++i) {
-                fn(stack->data[i]);
-            }
-        }
-        
-        stack->size = 0;
-    }
-}

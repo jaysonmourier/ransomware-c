@@ -67,7 +67,6 @@ int main(void) {
     assert(stack_is_empty(folders_stack));
     
     stack_free(&folders_stack, free_str);
-    stack_clear(files_stack, NULL);
     assert(stack_is_empty(files_stack));
 
     stack_free(&files_stack, free_str);
