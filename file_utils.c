@@ -183,7 +183,5 @@ void create_file_mappings(const wchar_t *file_path, DWORD *file_size, LPVOID *p_
     CloseHandle(h_file);
     CloseHandle(h_dest_map);
     CloseHandle(h_dest_file);
-
-    wprintf(L"Les mappings de fichiers ont été créés avec succès.\n");
 }
 
