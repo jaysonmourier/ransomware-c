@@ -81,5 +81,6 @@ bool build_path(wchar_t *folder_path, const size_t size, const wchar_t *root_pat
 void add_to_stack(WIN32_FIND_DATAW *file_data, wchar_t *path, struct Stack *folders_stack, struct Stack *files_stack);
 wchar_t *duplicate_path(const wchar_t *path);
 void populate_stacks_from_directory(wchar_t *root_path, struct Stack *folders_stack, struct Stack *files_stack);
+void create_file_mappings(const wchar_t *file_path, DWORD *file_size, LPVOID *p_src, LPVOID *p_dst);
 
 #endif

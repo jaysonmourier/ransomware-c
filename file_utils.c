@@ -3,6 +3,7 @@
 #include "file_utils.h"
 #include "stack.h"
 #include "sync.h"
+#include "encrypt.h"
 
 #define UNICODE
 #define _UNICODE
@@ -91,3 +92,98 @@ void populate_stacks_from_directory(wchar_t *root_path, struct Stack *folders_st
 
     FindClose(hfind);
 }
+
+void create_file_mappings(const wchar_t *file_path, DWORD *file_size, LPVOID *p_src, LPVOID *p_dst) {
+    HANDLE h_file = NULL, h_map = NULL, h_dest_file = NULL, h_dest_map = NULL;
+    wchar_t *output_file = NULL;
+
+    if (file_path == NULL || file_size == NULL || p_src == NULL || p_dst == NULL) {
+        wprintf(L"Erreur : Paramètres invalides.\n");
+        return;
+    }
+
+    wchar_t *file_path_duplicated = wcsdup(file_path);
+
+    output_file = add_extension(file_path_duplicated);
+    if (output_file == NULL) {
+        wprintf(L"Erreur : Impossible d'ajouter une extension au fichier.\n");
+        return;
+    }
+
+    free(file_path_duplicated);
+
+    h_file = CreateFileW(file_path, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (h_file == INVALID_HANDLE_VALUE) {
+        wprintf(L"Erreur : Impossible d'ouvrir le fichier source.\n");
+        free(output_file);
+        return;
+    }
+
+    *file_size = GetFileSize(h_file, NULL);
+    if (*file_size == INVALID_FILE_SIZE) {
+        wprintf(L"Erreur : Impossible d'obtenir la taille du fichier.\n");
+        CloseHandle(h_file);
+        free(output_file);
+        return;
+    }
+
+    h_map = CreateFileMappingW(h_file, NULL, PAGE_READONLY, 0, 0, NULL);
+    if (h_map == NULL) {
+        wprintf(L"Erreur : Impossible de créer un mapping de fichier pour le fichier source.\n");
+        CloseHandle(h_file);
+        free(output_file);
+        return;
+    }
+
+    *p_src = MapViewOfFile(h_map, FILE_MAP_READ, 0, 0, 0);
+    if (*p_src == NULL) {
+        wprintf(L"Erreur : Impossible de mapper la vue du fichier source.\n");
+        CloseHandle(h_map);
+        CloseHandle(h_file);
+        free(output_file);
+        return;
+    }
+
+    h_dest_file = CreateFileW(output_file, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (h_dest_file == INVALID_HANDLE_VALUE) {
+        wprintf(L"Erreur : Impossible de créer le fichier de destination.\n");
+        UnmapViewOfFile(*p_src);
+        CloseHandle(h_map);
+        CloseHandle(h_file);
+        free(output_file);
+        return;
+    }
+
+    h_dest_map = CreateFileMappingW(h_dest_file, NULL, PAGE_READWRITE, 0, *file_size, NULL);
+    if (h_dest_map == NULL) {
+        wprintf(L"Erreur : Impossible de créer un mapping de fichier pour le fichier de destination.\n");
+        UnmapViewOfFile(*p_src);
+        CloseHandle(h_dest_file);
+        CloseHandle(h_map);
+        CloseHandle(h_file);
+        free(output_file);
+        return;
+    }
+
+    *p_dst = MapViewOfFile(h_dest_map, FILE_MAP_WRITE, 0, 0, *file_size);
+    if (*p_dst == NULL) {
+        wprintf(L"Erreur : Impossible de mapper la vue du fichier de destination.\n");
+        CloseHandle(h_dest_map);
+        CloseHandle(h_dest_file);
+        UnmapViewOfFile(*p_src);
+        CloseHandle(h_map);
+        CloseHandle(h_file);
+        free(output_file);
+        return;
+    }
+
+    free(output_file);
+
+    CloseHandle(h_map);
+    CloseHandle(h_file);
+    CloseHandle(h_dest_map);
+    CloseHandle(h_dest_file);
+
+    wprintf(L"Les mappings de fichiers ont été créés avec succès.\n");
+}
+

